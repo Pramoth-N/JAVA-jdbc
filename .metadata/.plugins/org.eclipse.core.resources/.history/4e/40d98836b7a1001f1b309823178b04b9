@@ -1,0 +1,76 @@
+package JDBC;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JOptionPane;
+
+public class CartService {
+	private RegistrationApplication mainApp;
+	public CartService(RegistrationApplication mainApp) {
+		this.mainApp = mainApp;
+	}
+	public void addProduct(int productId, int quantity, double pricePerUnit) {
+        String sql = "INSERT INTO Cart (userId, productId, quantity, totalPrice) VALUES (?, ?, ?, ?)";
+        try (Connection conn = Database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             
+            pstmt.setInt(1, mainApp.userId);
+            pstmt.setInt(2, productId);
+            pstmt.setInt(3, quantity);
+            pstmt.setDouble(4, quantity * pricePerUnit);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                JOptionPane.showMessageDialog(mainApp, "Product added to cart successfully.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+	
+	public void updateProductQuantity(int productId, int newQuantity, double pricePerUnit) {
+        String sql = "UPDATE Cart SET quantity = ?, totalPrice = ? WHERE userId = ? AND productId = ?";
+        try (Connection conn = Database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             
+            pstmt.setInt(1, newQuantity);
+            pstmt.setDouble(2, newQuantity * pricePerUnit);
+            pstmt.setInt(3, mainApp.userId);
+            pstmt.setInt(4, productId);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+            	JOptionPane.showMessageDialog(mainApp,"Product quantity updated successfully.");
+            } else {
+            	JOptionPane.showMessageDialog(mainApp,"Product not found in cart.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public List<CartItem> getCartProducts() {
+        String sql = "SELECT * FROM Cart WHERE userId = ?";
+        List<CartItem> result = new ArrayList<>();
+        try (Connection conn = Database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             
+            pstmt.setInt(1, mainApp.userId);
+            ResultSet rs = pstmt.executeQuery();
+            while(rs.next()) {
+                int cartId = rs.getInt("cartId");
+                int productId = rs.getInt("productId");
+                int quantity = rs.getInt("quantity");
+                double totalPrice = rs.getDouble("totalPrice");
+            	CartItem item = new CartItem(cartId, productId, quantity, totalPrice);
+            	result.add(item);
+            }
+            return result;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+}

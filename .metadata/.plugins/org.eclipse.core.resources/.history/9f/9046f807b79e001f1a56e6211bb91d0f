@@ -1,0 +1,24 @@
+package JDBC;
+
+import java.awt.GridLayout;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+public class LoginPage extends JPanel{
+	private JTextField usernameField;
+	private JPasswordField userPasswordField;
+	
+	public LoginPage(RegistrationApplication mainApp) {
+		setLayout(new GridLayout(4,3,10,20));
+		
+		usernameField = new JTextField();
+		userPasswordField = new JPasswordField();
+		add(new JLabel("User Id"));
+		add(usernameField);
+		add(new JLabel("Password"));
+		add(userPasswordField);
+	}
+}

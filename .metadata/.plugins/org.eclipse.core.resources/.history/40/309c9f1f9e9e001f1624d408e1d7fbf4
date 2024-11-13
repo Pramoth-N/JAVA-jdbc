@@ -1,0 +1,20 @@
+package GUI;
+
+import java.awt.CardLayout;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+public class RegistrationApplication extends JFrame{
+		private CardLayout cardLayout;
+		private JPanel mainPanel;
+		
+		public RegistrationApplication() {
+			setTitle("Registration and  Login ");
+			setSize(414,896);
+			
+			cardLayout = new CardLayout();
+			mainPanel = new JPanel();
+			
+		}
+}

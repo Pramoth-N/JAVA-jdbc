@@ -1,0 +1,39 @@
+package JDBC;
+
+import javax.swing.*;
+
+public class Cart extends JPanel{
+	public RegistrationApplication mainApp;
+	private CartService cartService;
+	private JFrame frame;
+	private JTextField userIdField, productIdField, quantityField, priceField;
+	public Cart(RegistrationApplication mainApp) {
+		this.mainApp = mainApp;
+		cartService = new CartService(mainApp);
+		createUI();
+	}
+	
+	private void createUI() {
+		
+		JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new GridLayout(5, 2));
+
+        inputPanel.add(new JLabel("User ID:"));
+        userIdField = new JTextField();
+        inputPanel.add(userIdField);
+
+        inputPanel.add(new JLabel("Product ID:"));
+        productIdField = new JTextField();
+        inputPanel.add(productIdField);
+
+        inputPanel.add(new JLabel("Quantity:"));
+        quantityField = new JTextField();
+        inputPanel.add(quantityField);
+
+        inputPanel.add(new JLabel("Price per Unit:"));
+        priceField = new JTextField();
+        inputPanel.add(priceField);
+		add(inputPanel);
+	}
+	
+}

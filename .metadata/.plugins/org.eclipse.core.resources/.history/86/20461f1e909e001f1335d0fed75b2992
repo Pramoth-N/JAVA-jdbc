@@ -1,0 +1,138 @@
+package GUI;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.*;
+
+public class MainApplication extends JFrame {
+    private CardLayout cardLayout;
+    private JPanel mainPanel;
+    
+    public MainApplication() {
+        setTitle("Application");
+        setSize(414,896);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        
+        cardLayout = new CardLayout();
+        mainPanel = new JPanel(cardLayout);
+        
+        mainPanel.add(new LoginPage(this), "LoginPage");
+        mainPanel.add(new RegistrationPage(this), "RegistrationPage");
+        
+        add(mainPanel);
+        cardLayout.show(mainPanel, "LoginPage");
+    }
+    
+    public void showCard(String cardName) {
+        cardLayout.show(mainPanel, cardName);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new MainApplication().setVisible(true));
+    }
+}
+
+class LoginPage extends JPanel {
+    private JTextField usernameField;
+    private JPasswordField passwordField;
+
+    public LoginPage(MainApplication mainApp) {
+        setLayout(new GridLayout(3, 2, 10, 10));
+        usernameField = new JTextField();
+        passwordField = new JPasswordField();
+        JButton loginButton = new JButton("Login");
+        JButton registerButton = new JButton("Register");
+
+        loginButton.addActionListener(e -> login(mainApp));
+        registerButton.addActionListener(e -> mainApp.showCard("RegistrationPage"));
+
+        add(new JLabel("Username:"));
+        add(usernameField);
+        add(new JLabel("Password:"));
+        add(passwordField);
+        add(loginButton);
+        add(registerButton);
+    }
+
+    private void login(MainApplication mainApp) {
+        String username = usernameField.getText();
+        String password = new String(passwordField.getPassword());
+        
+        try (Connection connection = Database.getConnection()) {
+            String sql = "SELECT * FROM userdata WHERE user_name = ? AND password = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, password);
+            
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                JOptionPane.showMessageDialog(null, "Login successful!");
+                mainApp.showCard("LoginPage");
+            } else {
+                JOptionPane.showMessageDialog(null, "Invalid username or password", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+}
+
+class RegistrationPage extends JPanel {
+    private JTextField usernameField;
+    private JPasswordField passwordField;
+
+    public RegistrationPage(MainApplication mainApp) {
+        setLayout(new GridLayout(3, 2, 10, 10));
+        usernameField = new JTextField();
+        passwordField = new JPasswordField();
+        JButton registerButton = new JButton("Register");
+        JButton backButton = new JButton("Back to Login");
+
+        registerButton.addActionListener(e -> registerUser());
+        backButton.addActionListener(e -> mainApp.showCard("LoginPage"));
+
+        add(new JLabel("Username:"));
+        add(usernameField);
+        add(new JLabel("Password:"));
+        add(passwordField);
+        add(registerButton);
+        add(backButton);
+    }
+
+    private void registerUser() {
+        String username = usernameField.getText();
+        String password = new String(passwordField.getPassword());
+
+        try (Connection connection = Database.getConnection()) {
+            String sql = "INSERT INTO userdata (user_name, password) VALUES (?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, password);
+            
+            int rows = preparedStatement.executeUpdate();
+            if (rows > 0) {
+                JOptionPane.showMessageDialog(null, "Registration successful!");
+            }
+        } catch (SQLException ex) {
+            if (ex.getErrorCode() == 1062) {
+                JOptionPane.showMessageDialog(null, "Username already exists", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                ex.printStackTrace();
+            }
+        }
+    }
+}
+
+class Database {
+    private static final String URL = "jdbc:mysql://localhost:3306/bus_management_data_temp";
+    private static final String USER = "bus@admin";
+    private static final String PASSWORD = "123456";
+
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(URL, USER, PASSWORD);
+    }
+}
+

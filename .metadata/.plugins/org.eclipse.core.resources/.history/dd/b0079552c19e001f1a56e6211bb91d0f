@@ -1,0 +1,20 @@
+package JDBC;
+
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+public class RegistrationPage extends JPanel{
+	private JTextField usernameField;
+	private JPasswordField userPasswordField;
+	
+	public RegistrationPage(RegistrationApplication mainApp) {
+		setLayout(3,1,10,10);
+		
+		usernameField = new JTextField();
+		userPasswordField = new JPasswordField();
+		JButton loginButton = new JButton("Login");
+		JButton registerButton = new JButton("Register");
+	}
+}

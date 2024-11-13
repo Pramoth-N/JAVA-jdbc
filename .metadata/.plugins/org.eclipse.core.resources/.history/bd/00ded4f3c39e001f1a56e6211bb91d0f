@@ -1,0 +1,66 @@
+package JDBC;
+
+import java.awt.GridLayout;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+public class RegistrationPage extends JPanel{
+	private JTextField usernameField;
+	private JPasswordField userPasswordField;
+	
+	public RegistrationPage(RegistrationApplication mainApp) {
+		setLayout(new GridLayout(3,1,10,10));
+		
+		usernameField = new JTextField();
+		userPasswordField = new JPasswordField();
+		JButton loginButton = new JButton("Login");
+		JButton registerButton = new JButton("Register");
+		
+		add(new JLabel("User Id"));
+		add(usernameField);
+		add(new JLabel("Password"));
+		add(userPasswordField);
+		add(loginButton);
+		add(registerButton);
+		
+		loginButton.addActionListener(e->mainApp.showCard("LoginPage"));
+		registerButton.addActionListener(e->{
+			if(register(mainApp)) {
+				JOptionPane.showMessageDialog(mainApp, "Registration Successful");
+				mainApp.showCard("LoginPage");				
+			} else {
+				JOptionPane.showMessageDialog(mainApp, "Registration Failed");
+			}
+		}); 
+		
+	}
+	
+	private boolean register(RegistrationApplication mainApp) {
+		try(Connection connection = Database.getConnection()){
+			String querry = "INSERT INTO userdata (username,password) VALUES(?,?)";
+			
+			String name = usernameField.getText();
+			String password = new String(userPasswordField.getPassword());
+			
+			PreparedStatement preparedStatement = connection.prepareStatement(querry);
+			
+			preparedStatement.setString(1, name);
+			preparedStatement.setString(2, password);
+			
+			int rows = preparedStatement.executeUpdate();
+			
+			return rows > 0;
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+			return false;
+		}
+	}
+}

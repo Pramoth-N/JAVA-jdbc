@@ -1,0 +1,14 @@
+package JDBC;
+
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+public class LoginPage extends JPanel{
+	private JTextField usernameField;
+	private JPasswordField userPasswordField;
+	
+	public LoginPage(RegistrationApplication mainApp) {
+		
+	}
+}
